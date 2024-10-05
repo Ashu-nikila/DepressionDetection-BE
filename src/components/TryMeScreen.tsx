@@ -128,7 +128,9 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
 
     const formData = new FormData()
     formData.append('text', text.trim())
-    formData.append('image', selectedImage)
+    if (selectedImage) {
+      formData.append('image', selectedImage);
+    }
 
     try {
       console.log('Attempting to fetch from:', API_URL);

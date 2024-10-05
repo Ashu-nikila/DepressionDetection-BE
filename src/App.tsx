@@ -37,8 +37,8 @@ export default function App() {
         <Route path="/" element={isLoggedIn ? <Navigate to="/try-me" /> : <WelcomeScreen />} />
         <Route path="/login" element={isLoggedIn ? <Navigate to="/try-me" /> : <LoginScreen onLogin={handleLogin} />} />
         <Route path="/register" element={isLoggedIn ? <Navigate to="/try-me" /> : <RegisterScreen onRegister={handleRegister} />} />
-        <Route path="/try-me" element={isLoggedIn ? <TryMeScreen onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/results" element={isLoggedIn ? <ResultsScreen onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/try-me" element={isLoggedIn ? <TryMeScreen onLogout={handleLogout} /> : <Navigate to="/login" />} />        
+        <Route path="/results" element={isLoggedIn ? <ResultsScreen /> : <Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
