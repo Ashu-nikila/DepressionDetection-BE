@@ -4,8 +4,6 @@ import { Button } from "./ui/button"
 import { Textarea } from "./ui/textarea"
 import { ArrowLeft, LogOut, BrainIcon, Upload, Camera, X } from "lucide-react"
 
-
-
 export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
   const [text, setText] = useState('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
@@ -19,6 +17,36 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
 
   const API_URL = import.meta.env.REACT_APP_API_URL || 'https://mental-disorder-detection-backend.onrender.com/items/1'
   console.log('API_URL:', API_URL);
+
+  const testSimplePost = async () => {
+    try {
+      const response = await fetch('https://mental-disorder-detection-backend.onrender.com/simple-post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ test: 'data' }),
+      });
+  
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', response.status, response.statusText, errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+  
+      const result = await response.json();
+      console.log('Received result:', result);
+    } catch (error) {
+      console.error('Error in simple POST:', error);
+    }
+  };
+  
+  // Call this function to test
+  testSimplePost();
 
   useEffect(() => {
     if (cameraVisible) {
@@ -133,24 +161,27 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
     }
 
     try {
-      console.log('Attempting to fetch from:', API_URL);
+      console.log('Sending request to:', API_URL);
       console.log('FormData contents:', Object.fromEntries(formData.entries()));
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // Increase to 120 seconds (2 minutes)
 
-      console.log('Sending request to:', `${API_URL}/1`);
-      console.log('Text content:', text);
-      console.log('Image file:', selectedImage);
-
       const response = await fetch(API_URL, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+        },
         signal: controller.signal,
-      })
+      });
 
       clearTimeout(timeoutId);
-
+  
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+  
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Server response:', response.status, response.statusText, errorText);
