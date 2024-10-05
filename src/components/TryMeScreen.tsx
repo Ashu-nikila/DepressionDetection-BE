@@ -137,7 +137,7 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
       console.log('FormData contents:', Object.fromEntries(formData.entries()));
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // Increase to 120 seconds (2 minutes)
 
       console.log('Sending request to:', `${API_URL}/1`);
       console.log('Text content:', text);
@@ -157,11 +157,18 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
         throw new Error(`Server responded with ${response.status}: ${errorText}`);
       }
 
-    const result = await response.json()
-    console.log('Received result:', result);
-      
+      const result = await response.json()
+      console.log('Received result:', result);
+    
+      // Extract the relevant data from the result
+      const analysisResult = {
+        stressLevel: result.predictions, // Assuming predictions represent stress level
+      depressionLevel: result.predictions, // You might want to adjust this if you have separate stress and depression levels
+      reasoning: result.response_text,
+        imageDescription: result.image_description
+      };
       // Navigate to results page with the analysis data
-      navigate('/results', { state: { analysisResult: result } })
+      navigate('/results', { state: { analysisResult: analysisResult } })
     } catch (error) {
       console.error('Error details:', error);
       if (error instanceof Error) {
