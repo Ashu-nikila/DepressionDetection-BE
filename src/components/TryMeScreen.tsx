@@ -2,26 +2,31 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from "./ui/button"
 import { Textarea } from "./ui/textarea"
-import { ArrowLeft, BrainIcon, Upload, Camera, X } from "lucide-react"
+import { ArrowLeft, LogOut, BrainIcon, Upload, Camera, X } from "lucide-react"
+
+
 
 export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
   const [text, setText] = useState('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
-  const [showCamera, setShowCamera] = useState(false)
-  const navigate = useNavigate()
+  const [cameraVisible, setCameraVisible] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [cameraError, setCameraError] = useState<string | null>(null)  
+  const navigate = useNavigate()
+
+  const API_URL = import.meta.env.REACT_APP_API_URL || 'https://mental-disorder-detection-backend.onrender.com/items/1'
+  console.log('API_URL:', API_URL);
 
   useEffect(() => {
-    if (showCamera) {
+    if (cameraVisible) {
       startCamera()
     } else {
       stopCamera()
     }
-  }, [showCamera])
-
-  const [cameraError, setCameraError] = useState<string | null>(null)
+  }, [cameraVisible])
 
   const startCamera = async () => {
     try {
@@ -38,7 +43,29 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
       setCameraError(null)
     } catch (err) {
       console.error("Error accessing the camera", err)
-      setCameraError("Unable to access the camera. Please ensure you've granted camera permissions and are using a secure connection (HTTPS).")
+      if (err instanceof DOMException) {
+        switch (err.name) {
+          case 'NotAllowedError':
+            setCameraError("Camera access was denied. Please grant camera permissions in your browser settings.")
+            break
+          case 'NotFoundError':
+            setCameraError("No camera was found on your device.")
+            break
+          case 'NotReadableError':
+            setCameraError("Camera is already in use by another application.")
+            break
+          case 'OverconstrainedError':
+            setCameraError("Could not find a camera matching the specified constraints.")
+            break
+          case 'SecurityError':
+            setCameraError("Camera access was blocked due to security restrictions. Please ensure you're using HTTPS.")
+            break
+          default:
+            setCameraError(`An error occurred while accessing the camera: ${err.message}`)
+        }
+      } else {
+        setCameraError(`An unexpected error occurred: ${err}`)
+      }
     }
   }
 
@@ -70,7 +97,7 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
       setCameraError("Your browser doesn't support accessing the camera.")
       return
     }
-    setShowCamera(true)
+    setCameraVisible(true)
   }
 
   const handleCapture = () => {
@@ -82,16 +109,67 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
           if (blob) {
             const file = new File([blob], "selfie.jpg", { type: "image/jpeg" })
             setSelectedImage(file)
-            setShowCamera(false)
+            setCameraVisible(false)
           }
         }, 'image/jpeg')
       }
     }
   }
 
-  const handleDetect = () => {
-    console.log('Detecting stress and depression levels')
-    navigate('/results')
+  const handleDetect = async () => {
+
+    if (!text && !selectedImage) {
+      alert("Please enter some text or select an image before detecting.")
+      setIsLoading(false);
+      return
+    }
+
+    setIsLoading(true)
+
+    const formData = new FormData()
+    formData.append('text', text.trim())
+    formData.append('image', selectedImage)
+
+    try {
+      console.log('Attempting to fetch from:', API_URL);
+      console.log('FormData contents:', Object.fromEntries(formData.entries()));
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      console.log('Sending request to:', `${API_URL}/1`);
+      console.log('Text content:', text);
+      console.log('Image file:', selectedImage);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', response.status, response.statusText, errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+
+    const result = await response.json()
+    console.log('Received result:', result);
+      
+      // Navigate to results page with the analysis data
+      navigate('/results', { state: { analysisResult: result } })
+    } catch (error) {
+      console.error('Error details:', error);
+      if (error instanceof Error) {
+        alert(`An error occurred while analyzing: ${error.message}`);
+      } else {
+        alert('An unexpected error occurred while analyzing. Please try again.');
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleGoBack = () => {
@@ -101,10 +179,12 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-blue-100 relative overflow-hidden">
       <div className="max-w-md mx-auto px-4 py-8 relative z-10">
-        <header className="flex items-center mb-6">
-          <Button onClick={onLogout}>Logout</Button>
+        <header className="flex items-center justify-between mb-6">
+          <Button variant="ghost" onClick={onLogout} className="p-2">
+            <LogOut className="h-5 w-5" />
+          </Button>
           <h1 className="text-2xl font-semibold flex-grow text-center">Try Me</h1>
-          <BrainIcon className="ml-auto h-6 w-6 text-purple-500" />
+          <BrainIcon className="h-6 w-6 text-purple-500" />
         </header>
 
         <p className="text-sm text-gray-600 mb-6">
@@ -140,13 +220,17 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
             <p className="text-sm text-gray-600">Selected image: {selectedImage.name}</p>
           )}
 
-          <Button onClick={handleDetect} className="w-full bg-purple-500 hover:bg-purple-600">
-            Detect
+          <Button 
+            onClick={handleDetect} 
+            className="w-full bg-purple-500 hover:bg-purple-600"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Analyzing...' : 'Detect'}
           </Button>
         </div>
       </div>
 
-      {showCamera && (
+      {cameraVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg max-w-md w-full">
             <div className="relative">
@@ -165,7 +249,7 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
               )}
               <Button 
                 variant="ghost" 
-                onClick={() => setShowCamera(false)} 
+                onClick={() => setCameraVisible(false)} 
                 className="absolute top-2 right-2 text-black"
               >
                 <X className="h-6 w-6" />
