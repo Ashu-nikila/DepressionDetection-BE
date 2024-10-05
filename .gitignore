@@ -1,6 +1,5 @@
 # Node.js dependencies
 node_modules/
-# Dependency directories
 jspm_packages/
 # Optional npm cache directory
 .npm
@@ -8,9 +7,8 @@ jspm_packages/
 .eslintcache
 # Output of 'npm pack'
 *.tgz
-# Yarn v1
+# Yarn v1 and v2
 .yarn-integrity
-# Yarn v2 and above
 .yarn/cache
 .yarn/unplugged
 .yarn/build-state.yml
@@ -23,7 +21,7 @@ jspm_packages/
 !.yarn/sdks
 !.yarn/versions
 
-# local env files
+# Local environment files
 .env
 .env.local
 .env.development.local
@@ -34,21 +32,38 @@ jspm_packages/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
 
-# parcel-bundler cache (if using Parcel)
-.cache/
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Next.js build output (if using Next.js)
-.next/
+# Coverage and test reports
+coverage/
+*.lcov
+.nyc_output
 
-# production build
+# Grunt intermediate storage
+.grunt
+
+# Bower components
+bower_components/
+
+# Snowpack dependencies
+web_modules/
+
+# Build artifacts
 build/
+dist/
+.next/
+.nuxt/
+.cache/
+.parcel-cache
 
-# misc
-.DS_Store
-*.pem
-
-# IDE or editor-specific files
+# IDE and editor specific files
 .idea/
 .vscode/
 *.suo
@@ -56,3 +71,17 @@ build/
 *.njsproj
 *.sln
 *.sw?
+.vscode-test
+
+# Miscellaneous
+.DS_Store
+*.pem
+.node_repl_history
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.docusaurus
+.fusebox/
+.dynamodb/
+.tern-port
