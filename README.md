@@ -3,7 +3,6 @@ MentalDisorderDetetion is licensed under the GNU General Public License v3.0. Co
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 # DepressionDetection-BE
-
 ## Running React on Replit
 
 [React](https://reactjs.org/) is a popular JavaScript library for building user interfaces.
