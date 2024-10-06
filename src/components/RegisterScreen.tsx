@@ -9,6 +9,11 @@ interface RegisterScreenProps {
   onRegister: () => void;
 }
 
+const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
 export default function RegisterScreen({ onRegister }: RegisterScreenProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +22,10 @@ export default function RegisterScreen({ onRegister }: RegisterScreenProps) {
   const navigate = useNavigate()
 
   const handleRegister = () => {
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address")
+      return
+    }
     if (password !== confirmPassword) {
       setError("Passwords don't match")
       return

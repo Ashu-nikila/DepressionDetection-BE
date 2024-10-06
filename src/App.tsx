@@ -7,23 +7,48 @@ import RegisterScreen from './components/RegisterScreen'
 import TryMeScreen from './components/TryMeScreen'
 import ResultsScreen from './components/ResultsScreen'
 
+const isLoginValid = () => {
+  const loginTimestamp = localStorage.getItem('loginTimestamp')
+  if (loginTimestamp) {
+    const currentTime = new Date().getTime()
+    const loginTime = parseInt(loginTimestamp, 10)
+    // Check if the login was within the last 24 hours (86400000 milliseconds)
+    return currentTime - loginTime < 86400000
+  }
+  return false
+}
+
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const storedLoginState = localStorage.getItem('isLoggedIn')
-    return storedLoginState ? JSON.parse(storedLoginState) : false
-  })
+  const [isLoggedIn, setIsLoggedIn] = useState(isLoginValid)
 
   useEffect(() => {
-    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn))
-  }, [isLoggedIn])
+    const checkLoginStatus = () => {
+      if (isLoginValid()) {
+        setIsLoggedIn(true)
+      } else {
+        setIsLoggedIn(false)
+        localStorage.removeItem('isLoggedIn')
+        localStorage.removeItem('loginTimestamp')
+      }
+    }
+
+    checkLoginStatus()
+    // Check login status every minute
+    const intervalId = setInterval(checkLoginStatus, 60000)
+
+    return () => clearInterval(intervalId)
+  }, [])
 
   const handleLogin = () => {
+    localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('loginTimestamp', new Date().getTime().toString())
     setIsLoggedIn(true)
   }
 
   const handleLogout = () => {
-    setIsLoggedIn(false)
     localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('loginTimestamp')
+    setIsLoggedIn(false)
   }
 
   const handleRegister = () => {

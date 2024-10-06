@@ -9,6 +9,11 @@ interface LoginScreenProps {
   onLogin: () => void;
 }
 
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,14 +21,20 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const navigate = useNavigate()
 
   const handleLogin = () => {
-        // Check for default test credentials
-        if (email === 'test' && password === 'test') {
-          setError('')
-          onLogin()
-          navigate('/try-me')
-          return
-        }
-        
+    // Check for default test credentials
+    if (email === 'test' && password === 'test') {
+      setError('')
+      localStorage.setItem('loginTimestamp', new Date().getTime().toString())
+      onLogin()
+      navigate('/try-me')
+      return
+    }
+
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address")
+      return
+    }
+
     // Retrieve users from localStorage
     const users = JSON.parse(localStorage.getItem('users') || '[]')
     
@@ -32,6 +43,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
     if (user) {
       setError('')
+      localStorage.setItem('loginTimestamp', new Date().getTime().toString())
       onLogin()
       navigate('/try-me')
     } else {

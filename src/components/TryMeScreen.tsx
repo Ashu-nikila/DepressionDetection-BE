@@ -141,9 +141,6 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
         method: 'POST',
         body: formData,
         credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-        },
         signal: controller.signal,
       });
 
