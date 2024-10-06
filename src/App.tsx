@@ -9,11 +9,12 @@ import ResultsScreen from './components/ResultsScreen'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('isLoggedIn') === 'true'
+    const storedLoginState = localStorage.getItem('isLoggedIn')
+    return storedLoginState ? JSON.parse(storedLoginState) : false
   })
 
   useEffect(() => {
-    localStorage.setItem('isLoggedIn', isLoggedIn.toString())
+    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn))
   }, [isLoggedIn])
 
   const handleLogin = () => {

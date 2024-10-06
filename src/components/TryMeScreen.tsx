@@ -27,6 +27,8 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
           'Accept': 'application/json',
         },
         body: JSON.stringify({ test: 'data' }),
+        credentials: 'include',
+        mode: 'cors',
       });
   
       console.log('Response status:', response.status);
