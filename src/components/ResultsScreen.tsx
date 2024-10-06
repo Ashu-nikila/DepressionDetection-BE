@@ -16,10 +16,8 @@ export default function ResultsScreen() {
   const navigate = useNavigate()
   const analysisResult = location.state?.analysisResult as AnalysisResult
 
-  // ... other handlers ...
-
   const handleGoBack = () => {
-    navigate(-1) // This navigates to the previous page in the history
+    navigate(-1)
   }
 
   if (!analysisResult) {
@@ -27,8 +25,8 @@ export default function ResultsScreen() {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-100 to-blue-100">
-      <div className="max-w-md mx-auto px-4 py-8">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-purple-100 to-blue-100">
+      <div className="flex-grow max-w-md w-full mx-auto px-4 py-8">
         <header className="flex items-center mb-6">
           <Button variant="ghost" className="p-0 mr-4" onClick={handleGoBack}>
             <ArrowLeft className="h-6 w-6" />
@@ -42,32 +40,30 @@ export default function ResultsScreen() {
         </p>
   
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <Card className="bg-blue-100" style={{backgroundColor: '#EBF8FF'}}>
-            <CardContent className="p-4 flex flex-col items-center">
-              {/* ... (stress level content) ... */}
-              <h2 className="text-lg font-semibold mb-1">Stress Level</h2>
-              <div className="text-4xl font-bold text-blue-600" style={{color: '#2563EB'}}>{analysisResult.stressLevel}</div>
-              <p className="text-sm text-blue-600" style={{color: '#2563EB'}}>{analysisResult.stressLevel <= 5 ? 'Low' : 'High'}</p>
+          <Card className="bg-blue-100">
+          <CardContent className="p-4 flex flex-col items-center">
+            <h2 className="text-lg font-semibold mb-1">Stress Level</h2>
+            <div className="text-4xl font-bold text-blue-600">{analysisResult.stressLevel}</div>
+            <p className="text-sm text-blue-600">{analysisResult.stressLevel <= 5 ? 'Low' : 'High'}</p>
             </CardContent>
           </Card>
           <Card className="bg-purple-100">
             <CardContent className="p-4 flex flex-col items-center">
-              {/* ... (depression level content) ... */}
-              <h2 className="text-lg font-semibold mb-1">Depression Level</h2>
-              <div className="text-4xl font-bold text-purple-600">{analysisResult.depressionLevel}</div>
-              <p className="text-sm text-purple-600">{analysisResult.depressionLevel <= 5 ? 'Low' : 'High'}</p>
-            </CardContent>
-          </Card>
+            <h2 className="text-lg font-semibold mb-1">Depression Level</h2>
+            <div className="text-4xl font-bold text-purple-600">{analysisResult.depressionLevel}</div>
+            <p className="text-sm text-purple-600">{analysisResult.depressionLevel <= 5 ? 'Low' : 'High'}</p>
+          </CardContent>
+        </Card>
         </div>
   
-        <Card>
+        <Card className="mb-6">
           <CardContent className="p-4">
             <h2 className="text-lg font-semibold mb-2">Analysis</h2>
             <p className="text-sm text-gray-600">{analysisResult.reasoning}</p>
           </CardContent>
         </Card>
 
-        <Card className="mt-4">
+        <Card className="mb-6">
           <CardContent className="p-4">
             <h2 className="text-lg font-semibold mb-2">Image Description</h2>
             <p className="text-sm text-gray-600">{analysisResult.imageDescription}</p>
@@ -76,7 +72,7 @@ export default function ResultsScreen() {
       </div>
   
       {/* Decorative wave */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-blue-200 rounded-t-[100%] z-0"></div>
+      <div className="h-24 bg-blue-200 rounded-t-[100%]"></div>
     </div>
   )
 }

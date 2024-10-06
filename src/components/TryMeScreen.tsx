@@ -195,9 +195,9 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
     
       // Extract the relevant data from the result
       const analysisResult = {
-        stressLevel: result.predictions, // Assuming predictions represent stress level
-      depressionLevel: result.predictions, // You might want to adjust this if you have separate stress and depression levels
-      reasoning: result.response_text,
+        stressLevel: result.stress_level,
+        depressionLevel: result.depression_level,
+        reasoning: result.response_text,
         imageDescription: result.image_description
       };
       // Navigate to results page with the analysis data
