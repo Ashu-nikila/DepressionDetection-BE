@@ -18,38 +18,6 @@ export default function TryMeScreen({ onLogout }: { onLogout: () => void }) {
   const API_URL = import.meta.env.REACT_APP_API_URL || 'https://mental-disorder-detection-backend.onrender.com/items/1'
   console.log('API_URL:', API_URL);
 
-  const testSimplePost = async () => {
-    try {
-      const response = await fetch('https://mental-disorder-detection-backend.onrender.com/simple-post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ test: 'data' }),
-        credentials: 'include',
-        mode: 'cors',
-      });
-  
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server response:', response.status, response.statusText, errorText);
-        throw new Error(`Server responded with ${response.status}: ${errorText}`);
-      }
-  
-      const result = await response.json();
-      console.log('Received result:', result);
-    } catch (error) {
-      console.error('Error in simple POST:', error);
-    }
-  };
-  
-  // Call this function to test
-  testSimplePost();
-
   useEffect(() => {
     if (cameraVisible) {
       startCamera()
